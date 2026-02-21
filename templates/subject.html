@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}{{ subject.name }} – StudySprint{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <a href="{{ url_for('dashboard') }}" class="back-link">&larr; Dashboard</a>
+  <h1 style="color: {{ subject.color }}">{{ subject.name }}</h1>
+
+  <div class="overall-row">
+    <span class="overall-pct">{{ overall_completion }}% complete</span>
+    <div class="progress-track progress-track--wide">
+      <div class="progress-fill" style="width: {{ overall_completion }}%; background: {{ subject.color }}"></div>
+    </div>
+  </div>
+</section>
+
+<div class="kanban-board">
+  {% for col_key, col in columns.items() %}
+  <div class="kanban-column kanban-column--{{ col_key }}">
+    <div class="kanban-column__header">
+      <h2 class="kanban-column__title">{{ col.label }}</h2>
+      <span class="kanban-column__badge">{{ col.topics | length }}</span>
+    </div>
+
+    <div class="kanban-cards">
+      {% if col.topics %}
+        {% for topic in col.topics %}
+        <div class="topic-card topic-card--{{ col_key }}">
+          <div class="topic-card__top">
+            <span class="topic-card__title">{{ topic.title }}</span>
+            <span class="topic-card__diff" title="Difficulty {{ topic.difficulty }}/10">
+              D{{ topic.difficulty }}
+            </span>
+          </div>
+
+          <div class="topic-card__progress-label">
+            <span>Completion</span>
+            <span>{{ topic.completion }}%</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill progress-fill--{{ col_key }}"
+                 style="width: {{ topic.completion}}%;"></div>
+          </div>
+
+          <div class="topic-card__priority">
+            Priority score: <strong>{{ "%.2f"|format(topic.priority) }}</strong>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <p class="kanban-empty">No topics here yet.</p>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

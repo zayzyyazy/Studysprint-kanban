@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard – StudySprint{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <h1>My Study Dashboard</h1>
+  <p class="subtitle">Track your progress across all subjects.</p>
+</section>
+
+<div class="subject-grid">
+  {% for subj in subjects %}
+  <a href="{{ url_for('subject', subject_id=subj.id) }}" class="subject-card" style="--accent: {{ subj.color }}">
+    <div class="subject-card__header">
+      <h2 class="subject-card__name">{{ subj.name }}</h2>
+      <span class="subject-card__count">{{ subj.topic_count }} topics</span>
+    </div>
+
+    <div class="subject-card__pct">{{ subj.overall_completion }}%</div>
+
+    <div class="progress-track">
+      <div class="progress-fill" style="width: {{ subj.overall_completion }}%"></div>
+    </div>
+
+    <span class="subject-card__cta">View Board &rarr;</span>
+  </a>
+  {% endfor %}
+</div>
+{% endblock %}

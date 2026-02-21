@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}StudySprint Kanban{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body>
+  <header class="site-header">
+    <a href="{{ url_for('dashboard') }}" class="site-logo">
+      <span class="logo-icon">&#9654;</span> StudySprint
+    </a>
+    <nav class="site-nav">
+      <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    </nav>
+  </header>
+
+  <main class="site-main">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <p>StudySprint Kanban &mdash; Step 1 MVP</p>
+  </footer>
+</body>
+</html>
