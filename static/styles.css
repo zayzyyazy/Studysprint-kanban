@@ -1,25 +1,25 @@
 /* =========================================================
-   StudySprint Kanban – Step 1 MVP  |  styles.css
+   StudySprint Kanban  |  styles.css
    ========================================================= */
 
 /* ----- Reset & base ------------------------------------ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg:          #f8fafc;
+  --bg:          #f0f0f4;
   --surface:     #ffffff;
-  --border:      #e2e8f0;
-  --text:        #1e293b;
-  --text-muted:  #64748b;
-  --accent:      #4f46e5;
+  --border:      #e4e4ea;
+  --text:        #2c2c3e;
+  --text-muted:  #7c7c8a;
+  --accent:      #5C7AEA;
 
-  --col-not-started: #94a3b8;
-  --col-in-progress: #f59e0b;
-  --col-done:        #22c55e;
+  --col-not-started: #a0a8bb;
+  --col-in-progress: #c4935a;
+  --col-done:        #6a9c89;
 
-  --radius:  0.5rem;
-  --shadow:  0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
-  --shadow-md: 0 4px 6px -1px rgba(0,0,0,.1), 0 2px 4px -1px rgba(0,0,0,.06);
+  --radius:    0.75rem;
+  --shadow:    0 1px 4px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.09);
 }
 
 html { font-size: 16px; }
@@ -28,7 +28,7 @@ body {
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   background: var(--bg);
   color: var(--text);
-  line-height: 1.6;
+  line-height: 1.55;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -42,7 +42,7 @@ a { color: inherit; text-decoration: none; }
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   padding: 0 1.5rem;
-  height: 3.5rem;
+  height: 3.25rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -53,19 +53,20 @@ a { color: inherit; text-decoration: none; }
 
 .site-logo {
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: var(--accent);
   display: flex;
   align-items: center;
   gap: 0.4rem;
+  letter-spacing: -0.01em;
 }
 
-.logo-icon { font-size: 0.9rem; }
+.logo-icon { font-size: 0.85rem; }
 
 .site-nav a {
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   color: var(--text-muted);
-  padding: 0.25rem 0.5rem;
+  padding: 0.2rem 0.5rem;
   border-radius: var(--radius);
   transition: background 0.15s;
 }
@@ -76,16 +77,16 @@ a { color: inherit; text-decoration: none; }
 /* ----- Main -------------------------------------------- */
 .site-main {
   flex: 1;
-  padding: 2rem 1.5rem;
-  max-width: 72rem;
+  padding: 1.75rem 1.5rem;
+  max-width: 68rem;
   width: 100%;
   margin: 0 auto;
 }
 
 .site-footer {
   text-align: center;
-  padding: 1rem;
-  font-size: 0.8rem;
+  padding: 0.875rem;
+  font-size: 0.78rem;
   color: var(--text-muted);
   border-top: 1px solid var(--border);
 }
@@ -93,24 +94,25 @@ a { color: inherit; text-decoration: none; }
 
 /* ----- Page header ------------------------------------- */
 .page-header {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .page-header h1 {
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   font-weight: 700;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.15rem;
+  letter-spacing: -0.02em;
 }
 
 .subtitle {
   color: var(--text-muted);
-  font-size: 0.95rem;
+  font-size: 0.875rem;
 }
 
 .back-link {
   display: inline-block;
   color: var(--text-muted);
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   margin-bottom: 0.5rem;
   transition: color 0.15s;
 }
@@ -120,12 +122,12 @@ a { color: inherit; text-decoration: none; }
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-top: 0.75rem;
+  margin-top: 0.6rem;
   flex-wrap: wrap;
 }
 
 .overall-pct {
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   color: var(--text-muted);
   white-space: nowrap;
 }
@@ -133,7 +135,7 @@ a { color: inherit; text-decoration: none; }
 
 /* ----- Progress bar ------------------------------------ */
 .progress-track {
-  height: 6px;
+  height: 5px;
   background: var(--border);
   border-radius: 999px;
   overflow: hidden;
@@ -143,14 +145,14 @@ a { color: inherit; text-decoration: none; }
 .progress-track--wide {
   flex: 1;
   min-width: 8rem;
-  height: 8px;
+  height: 6px;
 }
 
 .progress-fill {
   height: 100%;
   background: var(--accent);
   border-radius: 999px;
-  transition: width 0.4s ease;
+  transition: width 0.35s ease;
 }
 
 .progress-fill--not_started { background: var(--col-not-started); }
@@ -161,21 +163,26 @@ a { color: inherit; text-decoration: none; }
 /* ----- Dashboard subject grid -------------------------- */
 .subject-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
-  gap: 1.25rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+@media (max-width: 40rem) {
+  .subject-grid { grid-template-columns: 1fr; }
 }
 
 .subject-card {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.6rem;
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-top: 4px solid var(--accent);
+  border: none;
+  border-left: 4px solid var(--accent);
   border-radius: var(--radius);
-  padding: 1.25rem 1.25rem 1rem;
+  padding: 1rem 1.1rem 0.875rem;
   box-shadow: var(--shadow);
-  transition: box-shadow 0.2s, transform 0.2s;
+  transition: box-shadow 0.2s, transform 0.15s;
 }
 
 .subject-card:hover {
@@ -191,29 +198,30 @@ a { color: inherit; text-decoration: none; }
 }
 
 .subject-card__name {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .subject-card__count {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--text-muted);
   white-space: nowrap;
   background: var(--bg);
-  padding: 0.15rem 0.5rem;
+  padding: 0.1rem 0.45rem;
   border-radius: 999px;
 }
 
 .subject-card__pct {
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 700;
-  color: var(--accent);
+  line-height: 1;
+  letter-spacing: -0.02em;
 }
 
 .subject-card__cta {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   color: var(--text-muted);
-  margin-top: 0.25rem;
   align-self: flex-end;
 }
 
@@ -224,7 +232,7 @@ a { color: inherit; text-decoration: none; }
 .kanban-board {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1.25rem;
+  gap: 1rem;
   align-items: start;
 }
 
@@ -243,55 +251,55 @@ a { color: inherit; text-decoration: none; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem 1rem;
+  padding: 0.65rem 0.9rem;
   font-weight: 600;
-  font-size: 0.875rem;
-  letter-spacing: 0.02em;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
-.kanban-column--not_started .kanban-column__header { background: #f1f5f9; color: #475569; }
-.kanban-column--in_progress .kanban-column__header { background: #fffbeb; color: #92400e; }
-.kanban-column--done        .kanban-column__header { background: #f0fdf4; color: #166534; }
+.kanban-column--not_started .kanban-column__header { background: #eef0f5; color: #5a6278; }
+.kanban-column--in_progress .kanban-column__header { background: #fdf5ec; color: #8a5a30; }
+.kanban-column--done        .kanban-column__header { background: #eef5f2; color: #3a6b5a; }
 
 .kanban-column__badge {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 999px;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  padding: 0.1rem 0.55rem;
+  padding: 0.1rem 0.5rem;
   color: var(--text-muted);
 }
 
 .kanban-cards {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  padding: 0.75rem;
+  gap: 0.65rem;
+  padding: 0.65rem;
 }
 
 .kanban-empty {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   color: var(--text-muted);
   text-align: center;
-  padding: 1rem 0;
+  padding: 0.875rem 0;
 }
 
 
 /* ----- Topic card -------------------------------------- */
 .topic-card {
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 0.875rem 1rem;
+  border: none;
+  border-radius: calc(var(--radius) - 0.125rem);
+  padding: 0.75rem 0.875rem;
   box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.45rem;
 }
 
-.topic-card--done { opacity: 0.75; }
+.topic-card--done { opacity: 0.72; }
 
 .topic-card__top {
   display: flex;
@@ -301,18 +309,18 @@ a { color: inherit; text-decoration: none; }
 }
 
 .topic-card__title {
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   font-weight: 600;
   line-height: 1.3;
 }
 
 .topic-card__diff {
   flex-shrink: 0;
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 700;
-  padding: 0.15rem 0.45rem;
+  padding: 0.12rem 0.4rem;
   border-radius: 999px;
-  background: #f1f5f9;
+  background: var(--bg);
   color: var(--text-muted);
   letter-spacing: 0.03em;
 }
@@ -320,12 +328,12 @@ a { color: inherit; text-decoration: none; }
 .topic-card__progress-label {
   display: flex;
   justify-content: space-between;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--text-muted);
 }
 
 .topic-card__priority {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   color: var(--text-muted);
   text-align: right;
 }
@@ -334,13 +342,13 @@ a { color: inherit; text-decoration: none; }
 
 
 /* =========================================================
-   Forms, buttons, panels  (Step 2 – DB + CRUD forms)
+   Forms, buttons, panels
    ========================================================= */
 
 /* ----- Buttons ----------------------------------------- */
 .btn {
   display: inline-block;
-  padding: 0.45rem 1rem;
+  padding: 0.4rem 0.9rem;
   border: none;
   border-radius: var(--radius);
   font-size: 0.875rem;
@@ -351,35 +359,35 @@ a { color: inherit; text-decoration: none; }
   white-space: nowrap;
 }
 
-.btn:hover  { opacity: 0.88; }
-.btn:active { opacity: 0.75; }
+.btn:hover  { opacity: 0.87; }
+.btn:active { opacity: 0.73; }
 
 .btn--primary   { background: var(--accent); color: #fff; }
-.btn--secondary { background: #e2e8f0;       color: var(--text); }
-.btn--danger    { background: #ef4444;        color: #fff; }
+.btn--secondary { background: #e8e8ed;       color: var(--text); }
+.btn--danger    { background: #d95f5f;        color: #fff; }
 
 .btn--sm {
-  padding: 0.3rem 0.7rem;
-  font-size: 0.8rem;
+  padding: 0.28rem 0.65rem;
+  font-size: 0.78rem;
 }
 
 
 /* ----- Form inputs ------------------------------------- */
 .form-label {
   display: block;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-muted);
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.2rem;
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
 
 .form-input {
   width: 100%;
-  padding: 0.45rem 0.65rem;
+  padding: 0.4rem 0.6rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: calc(var(--radius) - 0.25rem);
   font-size: 0.875rem;
   color: var(--text);
   background: var(--surface);
@@ -389,10 +397,10 @@ a { color: inherit; text-decoration: none; }
 
 .form-input:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(79,70,229,.15);
+  box-shadow: 0 0 0 3px rgba(92,122,234,.12);
 }
 
-.form-input--sm   { font-size: 0.8rem; padding: 0.35rem 0.55rem; }
+.form-input--sm    { font-size: 0.78rem; padding: 0.3rem 0.5rem; }
 .form-input--short { width: 5rem; }
 
 
@@ -400,11 +408,11 @@ a { color: inherit; text-decoration: none; }
 .form-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: 0.65rem;
   align-items: flex-end;
 }
 
-.form-row--3 { gap: 0.5rem; }
+.form-row--3 { gap: 0.45rem; }
 
 .form-row--topic { align-items: flex-end; }
 
@@ -417,28 +425,26 @@ a { color: inherit; text-decoration: none; }
 
 /* ----- Add panel (Add Subject / Add Topic) ------------- */
 .add-panel {
-  margin-top: 2.5rem;
-  padding-top: 1.5rem;
+  margin-top: 2rem;
+  padding-top: 1.25rem;
   border-top: 1px solid var(--border);
 }
 
 .add-panel__title {
-  font-size: 1rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: var(--text-muted);
-  margin-bottom: 0.875rem;
+  margin-bottom: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
 }
 
 .add-form {
   display: flex;
-  gap: 0.75rem;
-  align-items: center;
+  gap: 0.65rem;
+  align-items: flex-end;
   flex-wrap: wrap;
 }
-
-.add-form .form-input { flex: 1; min-width: 14rem; }
 
 .add-form--topic { display: block; }
 
@@ -446,10 +452,10 @@ a { color: inherit; text-decoration: none; }
 /* ----- Inline edit (details/summary on topic card) ----- */
 .topic-card__actions {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.45rem;
   align-items: flex-start;
   flex-wrap: wrap;
-  margin-top: 0.25rem;
+  margin-top: 0.2rem;
 }
 
 .edit-details { flex: 1; min-width: 0; }
@@ -462,14 +468,14 @@ a { color: inherit; text-decoration: none; }
 .edit-details > summary::-webkit-details-marker { display: none; }
 
 .edit-form {
-  margin-top: 0.6rem;
-  padding: 0.75rem;
+  margin-top: 0.55rem;
+  padding: 0.65rem;
   background: var(--bg);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: calc(var(--radius) - 0.125rem);
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 0.55rem;
 }
 
 .delete-form { flex-shrink: 0; }
@@ -479,54 +485,9 @@ a { color: inherit; text-decoration: none; }
 .empty-state {
   text-align: center;
   color: var(--text-muted);
-  font-size: 0.95rem;
-  padding: 2.5rem 1rem;
+  font-size: 0.9rem;
+  padding: 2.25rem 1rem;
   border: 2px dashed var(--border);
   border-radius: var(--radius);
-  margin-bottom: 1.5rem;
-}
-
-
-/* ----- Focus Now section ------------------------------- */
-.focus-section {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-left: 4px solid #f59e0b;
-  border-radius: var(--radius);
-  padding: 1rem 1.25rem;
-  margin-bottom: 2rem;
-  box-shadow: var(--shadow);
-}
-
-.focus-section__title {
-  font-size: 0.95rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text);
-  margin-bottom: 0.75rem;
-}
-
-.focus-list {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.focus-item {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  font-size: 0.875rem;
-}
-
-.focus-item__title   { font-weight: 600; color: var(--text); }
-.focus-item__sep     { color: var(--border); }
-.focus-item__subject { color: var(--text-muted); font-size: 0.8rem; }
-.focus-item__pct     { font-weight: 600; color: #f59e0b; margin-left: auto; }
-
-.focus-empty {
-  font-size: 0.875rem;
-  color: var(--text-muted);
+  margin-bottom: 1.25rem;
 }

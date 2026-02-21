@@ -1,5 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
+import random
 
 app = Flask(__name__)
 
@@ -13,12 +14,26 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
 # ---------------------------------------------------------------------------
+# Palette
+# ---------------------------------------------------------------------------
+
+SUBJECT_COLORS = [
+    "#5C7AEA",
+    "#6A9C89",
+    "#8E7DBE",
+    "#C97B63",
+    "#5F6F94",
+    "#C8B6A6",
+]
+
+# ---------------------------------------------------------------------------
 # Models
 # ---------------------------------------------------------------------------
 
 class Subject(db.Model):
-    id   = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), nullable=False)
+    id    = db.Column(db.Integer, primary_key=True)
+    name  = db.Column(db.String(120), nullable=False)
+    color = db.Column(db.String(7),   nullable=False, server_default="#5C7AEA")
 
     topics = db.relationship("Topic", backref="subject", lazy=True)
 
@@ -49,25 +64,22 @@ STATUS_COLUMN = {
     "Done":        "done",
 }
 
-VALID_STATUSES = list(STATUS_COLUMN.keys())  # ["Not Started", "In Progress", "Done"]
+VALID_STATUSES = list(STATUS_COLUMN.keys())
 
 
 def priority_score(topic) -> float:
-    """Higher score → shown first within a column."""
     remaining       = 1 - topic.completion / 100
     difficulty_norm = topic.difficulty / 10
     return remaining * (0.6 + 0.4 * difficulty_norm)
 
 
 def subject_completion(subject) -> int:
-    """Average completion of all topics, rounded to nearest int."""
     if not subject.topics:
         return 0
     return round(sum(t.completion for t in subject.topics) / len(subject.topics))
 
 
 def parse_topic_form(form) -> tuple:
-    """Extract, validate, and clamp topic fields from a POST form."""
     title = form.get("title", "").strip()
 
     try:
@@ -84,7 +96,7 @@ def parse_topic_form(form) -> tuple:
     if status not in VALID_STATUSES:
         status = "Not Started"
 
-    if status == "Done":        # Done always means 100 %
+    if status == "Done":
         completion = 100
 
     return title, difficulty, completion, status
@@ -101,32 +113,24 @@ def dashboard():
         {
             "id":                 s.id,
             "name":               s.name,
+            "color":              s.color,
             "overall_completion": subject_completion(s),
             "topic_count":        len(s.topics),
         }
         for s in subjects
     ]
-
-    incomplete = Topic.query.filter(Topic.completion < 100).all()
-    incomplete.sort(key=priority_score, reverse=True)
-    focus_topics = [
-        {
-            "title":       t.title,
-            "subject_name": t.subject.name,
-            "completion":  t.completion,
-        }
-        for t in incomplete[:5]
-    ]
-
     return render_template("dashboard.html", subjects=subject_data,
-                           focus_topics=focus_topics)
+                           subject_colors=SUBJECT_COLORS)
 
 
 @app.route("/subjects", methods=["POST"])
 def add_subject():
     name = request.form.get("name", "").strip()
     if name:
-        db.session.add(Subject(name=name))
+        color = request.form.get("color", "").strip()
+        if color not in SUBJECT_COLORS:
+            color = random.choice(SUBJECT_COLORS)
+        db.session.add(Subject(name=name, color=color))
         db.session.commit()
     return redirect(url_for("dashboard"))
 
@@ -166,7 +170,7 @@ def subject(subject_id: int):
 
 @app.route("/subjects/<int:subject_id>/topics", methods=["POST"])
 def add_topic(subject_id: int):
-    db.get_or_404(Subject, subject_id)  # 404 if subject doesn't exist
+    db.get_or_404(Subject, subject_id)
     title, difficulty, completion, status = parse_topic_form(request.form)
     if title:
         db.session.add(Topic(

@@ -8,38 +8,22 @@
   <p class="subtitle">Track your progress across all subjects.</p>
 </section>
 
-<section class="focus-section">
-  <h2 class="focus-section__title">🔥 Focus Now</h2>
-  {% if focus_topics %}
-  <ul class="focus-list">
-    {% for t in focus_topics %}
-    <li class="focus-item">
-      <span class="focus-item__title">{{ t.title }}</span>
-      <span class="focus-item__sep">—</span>
-      <span class="focus-item__subject">{{ t.subject_name[:10] }}{% if t.subject_name|length > 10 %}…{% endif %}</span>
-      <span class="focus-item__sep">—</span>
-      <span class="focus-item__pct">{{ t.completion }}%</span>
-    </li>
-    {% endfor %}
-  </ul>
-  {% else %}
-  <p class="focus-empty">No active topics yet.</p>
-  {% endif %}
-</section>
-
 {% if subjects %}
 <div class="subject-grid">
   {% for subj in subjects %}
-  <a href="{{ url_for('subject', subject_id=subj.id) }}" class="subject-card">
+  <a href="{{ url_for('subject', subject_id=subj.id) }}"
+     class="subject-card"
+     style="border-left-color: {{ subj.color }}">
     <div class="subject-card__header">
       <h2 class="subject-card__name">{{ subj.name }}</h2>
       <span class="subject-card__count">{{ subj.topic_count }} topic{% if subj.topic_count != 1 %}s{% endif %}</span>
     </div>
 
-    <div class="subject-card__pct">{{ subj.overall_completion }}%</div>
+    <div class="subject-card__pct" style="color: {{ subj.color }}">{{ subj.overall_completion }}%</div>
 
     <div class="progress-track">
-      <div class="progress-fill" style="width: {{ subj.overall_completion }}%"></div>
+      <div class="progress-fill"
+           style="width: {{ subj.overall_completion }}%; background: {{ subj.color }}"></div>
     </div>
 
     <span class="subject-card__cta">View Board &rarr;</span>
@@ -53,15 +37,34 @@
 <section class="add-panel">
   <h2 class="add-panel__title">Add Subject</h2>
   <form method="POST" action="{{ url_for('add_subject') }}" class="add-form">
-    <input
-      type="text"
-      name="name"
-      placeholder="e.g. Mathematics"
-      required
-      class="form-input"
-      autocomplete="off"
-    />
-    <button type="submit" class="btn btn--primary">+ Add Subject</button>
+    <div class="form-group form-group--grow">
+      <label class="form-label" for="subject-name">Name</label>
+      <input
+        type="text"
+        id="subject-name"
+        name="name"
+        placeholder="e.g. Mathematics"
+        required
+        class="form-input"
+        autocomplete="off"
+      />
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="subject-color">Color</label>
+      <select id="subject-color" name="color" class="form-input color-select">
+        <option value="">Auto-assign</option>
+        <option value="#5C7AEA">Periwinkle</option>
+        <option value="#6A9C89">Sage</option>
+        <option value="#8E7DBE">Lavender</option>
+        <option value="#C97B63">Terracotta</option>
+        <option value="#5F6F94">Slate</option>
+        <option value="#C8B6A6">Warm Grey</option>
+      </select>
+    </div>
+    <div class="form-group form-group--btn">
+      <label class="form-label">&nbsp;</label>
+      <button type="submit" class="btn btn--primary">+ Add Subject</button>
+    </div>
   </form>
 </section>
 {% endblock %}
