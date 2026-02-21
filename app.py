@@ -1,4 +1,4 @@
-from flask import Flask, render_template, abort
+from flask import Flask, render_template, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -37,71 +37,57 @@ class Topic(db.Model):
     def __repr__(self):
         return f"<Topic {self.id}: {self.title}>"
 
+
 # ---------------------------------------------------------------------------
-# In-memory sample data  (Step 1 – no database)
+# Helpers
 # ---------------------------------------------------------------------------
 
-SUBJECTS = {
-    "math": {
-        "id": "math",
-        "name": "Mathematics",
-        "color": "#4f46e5",
-        "topics": [
-            {"id": 1, "title": "Limits & Continuity",      "difficulty": 6,  "completion": 100, "status": "done"},
-            {"id": 2, "title": "Derivatives",               "difficulty": 7,  "completion": 100, "status": "done"},
-            {"id": 3, "title": "Integration Techniques",    "difficulty": 9,  "completion": 60,  "status": "in_progress"},
-            {"id": 4, "title": "Sequences & Series",        "difficulty": 8,  "completion": 30,  "status": "in_progress"},
-            {"id": 5, "title": "Multivariable Calculus",    "difficulty": 10, "completion": 0,   "status": "not_started"},
-            {"id": 6, "title": "Differential Equations",    "difficulty": 9,  "completion": 0,   "status": "not_started"},
-            {"id": 7, "title": "Linear Algebra",            "difficulty": 7,  "completion": 0,   "status": "not_started"},
-        ],
-    },
-    "cs": {
-        "id": "cs",
-        "name": "Computer Science",
-        "color": "#0891b2",
-        "topics": [
-            {"id": 101, "title": "Big-O Notation",          "difficulty": 4,  "completion": 100, "status": "done"},
-            {"id": 102, "title": "Sorting Algorithms",      "difficulty": 5,  "completion": 100, "status": "done"},
-            {"id": 103, "title": "Binary Search Trees",     "difficulty": 6,  "completion": 75,  "status": "in_progress"},
-            {"id": 104, "title": "Graph Traversal (BFS/DFS)","difficulty": 7, "completion": 40,  "status": "in_progress"},
-            {"id": 105, "title": "Dynamic Programming",     "difficulty": 9,  "completion": 10,  "status": "in_progress"},
-            {"id": 106, "title": "Greedy Algorithms",       "difficulty": 6,  "completion": 0,   "status": "not_started"},
-            {"id": 107, "title": "Heaps & Priority Queues", "difficulty": 5,  "completion": 0,   "status": "not_started"},
-        ],
-    },
-    "physics": {
-        "id": "physics",
-        "name": "Physics",
-        "color": "#059669",
-        "topics": [
-            {"id": 201, "title": "Kinematics",              "difficulty": 4,  "completion": 100, "status": "done"},
-            {"id": 202, "title": "Newton's Laws",           "difficulty": 5,  "completion": 100, "status": "done"},
-            {"id": 203, "title": "Work, Energy & Power",    "difficulty": 6,  "completion": 80,  "status": "in_progress"},
-            {"id": 204, "title": "Momentum & Collisions",   "difficulty": 6,  "completion": 50,  "status": "in_progress"},
-            {"id": 205, "title": "Rotational Motion",       "difficulty": 8,  "completion": 0,   "status": "not_started"},
-            {"id": 206, "title": "Electrostatics",          "difficulty": 8,  "completion": 0,   "status": "not_started"},
-            {"id": 207, "title": "Electromagnetic Waves",   "difficulty": 9,  "completion": 0,   "status": "not_started"},
-        ],
-    },
+# Maps DB status values → kanban column keys (used as CSS class suffixes)
+STATUS_COLUMN = {
+    "Not Started": "not_started",
+    "In Progress": "in_progress",
+    "Done":        "done",
 }
 
-# ---------------------------------------------------------------------------
-# Priority scoring
-# ---------------------------------------------------------------------------
+VALID_STATUSES = list(STATUS_COLUMN.keys())  # ["Not Started", "In Progress", "Done"]
 
-def priority_score(topic: dict) -> float:
-    """Higher score → show first within a column."""
-    remaining = 1 - topic["completion"] / 100
-    difficulty_norm = topic["difficulty"] / 10
+
+def priority_score(topic) -> float:
+    """Higher score → shown first within a column."""
+    remaining       = 1 - topic.completion / 100
+    difficulty_norm = topic.difficulty / 10
     return remaining * (0.6 + 0.4 * difficulty_norm)
 
 
-def subject_completion(subject: dict) -> int:
-    topics = subject["topics"]
-    if not topics:
+def subject_completion(subject) -> int:
+    """Average completion of all topics, rounded to nearest int."""
+    if not subject.topics:
         return 0
-    return round(sum(t["completion"] for t in topics) / len(topics))
+    return round(sum(t.completion for t in subject.topics) / len(subject.topics))
+
+
+def parse_topic_form(form) -> tuple:
+    """Extract, validate, and clamp topic fields from a POST form."""
+    title = form.get("title", "").strip()
+
+    try:
+        difficulty = max(1, min(10, int(form.get("difficulty", 5))))
+    except (ValueError, TypeError):
+        difficulty = 5
+
+    try:
+        completion = max(0, min(100, int(form.get("completion", 0))))
+    except (ValueError, TypeError):
+        completion = 0
+
+    status = form.get("status", "Not Started")
+    if status not in VALID_STATUSES:
+        status = "Not Started"
+
+    if status == "Done":        # Done always means 100 %
+        completion = 100
+
+    return title, difficulty, completion, status
 
 
 # ---------------------------------------------------------------------------
@@ -110,22 +96,31 @@ def subject_completion(subject: dict) -> int:
 
 @app.route("/")
 def dashboard():
-    subjects = []
-    for subj in SUBJECTS.values():
-        subjects.append({
-            **subj,
-            "overall_completion": subject_completion(subj),
-            "topic_count": len(subj["topics"]),
-        })
-    subjects.sort(key=lambda s: s["name"])
-    return render_template("dashboard.html", subjects=subjects)
+    subjects = Subject.query.order_by(Subject.name).all()
+    subject_data = [
+        {
+            "id":                 s.id,
+            "name":               s.name,
+            "overall_completion": subject_completion(s),
+            "topic_count":        len(s.topics),
+        }
+        for s in subjects
+    ]
+    return render_template("dashboard.html", subjects=subject_data)
 
 
-@app.route("/subjects/<subject_id>")
-def subject(subject_id: str):
-    subj = SUBJECTS.get(subject_id)
-    if subj is None:
-        abort(404)
+@app.route("/subjects", methods=["POST"])
+def add_subject():
+    name = request.form.get("name", "").strip()
+    if name:
+        db.session.add(Subject(name=name))
+        db.session.commit()
+    return redirect(url_for("dashboard"))
+
+
+@app.route("/subjects/<int:subject_id>")
+def subject(subject_id: int):
+    subj = db.get_or_404(Subject, subject_id)
 
     columns = {
         "not_started": {"label": "Not Started", "topics": []},
@@ -133,15 +128,17 @@ def subject(subject_id: str):
         "done":        {"label": "Done",         "topics": []},
     }
 
-    for topic in subj["topics"]:
-        col_key = topic["status"]
-        if col_key in columns:
-            columns[col_key]["topics"].append({
-                **topic,
-                "priority": priority_score(topic),
-            })
+    for t in subj.topics:
+        col_key = STATUS_COLUMN.get(t.status, "not_started")
+        columns[col_key]["topics"].append({
+            "id":         t.id,
+            "title":      t.title,
+            "difficulty": t.difficulty,
+            "completion": t.completion,
+            "status":     t.status,
+            "priority":   priority_score(t),
+        })
 
-    # Sort each column by priority descending
     for col in columns.values():
         col["topics"].sort(key=lambda t: t["priority"], reverse=True)
 
@@ -150,12 +147,51 @@ def subject(subject_id: str):
         subject=subj,
         columns=columns,
         overall_completion=subject_completion(subj),
+        valid_statuses=VALID_STATUSES,
     )
+
+
+@app.route("/subjects/<int:subject_id>/topics", methods=["POST"])
+def add_topic(subject_id: int):
+    db.get_or_404(Subject, subject_id)  # 404 if subject doesn't exist
+    title, difficulty, completion, status = parse_topic_form(request.form)
+    if title:
+        db.session.add(Topic(
+            subject_id=subject_id,
+            title=title,
+            difficulty=difficulty,
+            completion=completion,
+            status=status,
+        ))
+        db.session.commit()
+    return redirect(url_for("subject", subject_id=subject_id))
+
+
+@app.route("/topics/<int:topic_id>/update", methods=["POST"])
+def update_topic(topic_id: int):
+    topic = db.get_or_404(Topic, topic_id)
+    title, difficulty, completion, status = parse_topic_form(request.form)
+    if title:
+        topic.title      = title
+        topic.difficulty = difficulty
+        topic.completion = completion
+        topic.status     = status
+        db.session.commit()
+    return redirect(url_for("subject", subject_id=topic.subject_id))
+
+
+@app.route("/topics/<int:topic_id>/delete", methods=["POST"])
+def delete_topic(topic_id: int):
+    topic = db.get_or_404(Topic, topic_id)
+    subject_id = topic.subject_id
+    db.session.delete(topic)
+    db.session.commit()
+    return redirect(url_for("subject", subject_id=subject_id))
 
 
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
     with app.app_context():
-        db.create_all()          # creates studysprint.db + tables if not present
+        db.create_all()
     app.run(host="0.0.0.0", port=5001, debug=True)

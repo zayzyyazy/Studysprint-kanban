@@ -8,12 +8,13 @@
   <p class="subtitle">Track your progress across all subjects.</p>
 </section>
 
+{% if subjects %}
 <div class="subject-grid">
   {% for subj in subjects %}
-  <a href="{{ url_for('subject', subject_id=subj.id) }}" class="subject-card" style="--accent: {{ subj.color }}">
+  <a href="{{ url_for('subject', subject_id=subj.id) }}" class="subject-card">
     <div class="subject-card__header">
       <h2 class="subject-card__name">{{ subj.name }}</h2>
-      <span class="subject-card__count">{{ subj.topic_count }} topics</span>
+      <span class="subject-card__count">{{ subj.topic_count }} topic{% if subj.topic_count != 1 %}s{% endif %}</span>
     </div>
 
     <div class="subject-card__pct">{{ subj.overall_completion }}%</div>
@@ -26,4 +27,22 @@
   </a>
   {% endfor %}
 </div>
+{% else %}
+<p class="empty-state">No subjects yet — add one below to get started.</p>
+{% endif %}
+
+<section class="add-panel">
+  <h2 class="add-panel__title">Add Subject</h2>
+  <form method="POST" action="{{ url_for('add_subject') }}" class="add-form">
+    <input
+      type="text"
+      name="name"
+      placeholder="e.g. Mathematics"
+      required
+      class="form-input"
+      autocomplete="off"
+    />
+    <button type="submit" class="btn btn--primary">+ Add Subject</button>
+  </form>
+</section>
 {% endblock %}
