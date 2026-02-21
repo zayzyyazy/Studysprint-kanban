@@ -8,6 +8,25 @@
   <p class="subtitle">Track your progress across all subjects.</p>
 </section>
 
+<section class="focus-section">
+  <h2 class="focus-section__title">🔥 Focus Now</h2>
+  {% if focus_topics %}
+  <ul class="focus-list">
+    {% for t in focus_topics %}
+    <li class="focus-item">
+      <span class="focus-item__title">{{ t.title }}</span>
+      <span class="focus-item__sep">—</span>
+      <span class="focus-item__subject">{{ t.subject_name[:10] }}{% if t.subject_name|length > 10 %}…{% endif %}</span>
+      <span class="focus-item__sep">—</span>
+      <span class="focus-item__pct">{{ t.completion }}%</span>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="focus-empty">No active topics yet.</p>
+  {% endif %}
+</section>
+
 {% if subjects %}
 <div class="subject-grid">
   {% for subj in subjects %}

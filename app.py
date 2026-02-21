@@ -106,7 +106,20 @@ def dashboard():
         }
         for s in subjects
     ]
-    return render_template("dashboard.html", subjects=subject_data)
+
+    incomplete = Topic.query.filter(Topic.completion < 100).all()
+    incomplete.sort(key=priority_score, reverse=True)
+    focus_topics = [
+        {
+            "title":       t.title,
+            "subject_name": t.subject.name,
+            "completion":  t.completion,
+        }
+        for t in incomplete[:5]
+    ]
+
+    return render_template("dashboard.html", subjects=subject_data,
+                           focus_topics=focus_topics)
 
 
 @app.route("/subjects", methods=["POST"])
