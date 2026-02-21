@@ -1,6 +1,45 @@
 from flask import Flask, render_template, abort
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
+
+# ---------------------------------------------------------------------------
+# Database configuration
+# ---------------------------------------------------------------------------
+
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///studysprint.db"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+db = SQLAlchemy(app)
+
+# ---------------------------------------------------------------------------
+# Models
+# ---------------------------------------------------------------------------
+
+class Subject(db.Model):
+    __tablename__ = "subjects"
+
+    id   = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), nullable=False)
+
+    topics = db.relationship("Topic", backref="subject", lazy=True)
+
+    def __repr__(self):
+        return f"<Subject {self.id}: {self.name}>"
+
+
+class Topic(db.Model):
+    __tablename__ = "topics"
+
+    id         = db.Column(db.Integer, primary_key=True)
+    subject_id = db.Column(db.Integer, db.ForeignKey("subjects.id"), nullable=False)
+    title      = db.Column(db.String(200), nullable=False)
+    difficulty = db.Column(db.Integer, default=5)        # 1–10
+    completion = db.Column(db.Integer, default=0)        # 0–100
+    status     = db.Column(db.String(20), default="not_started")
+
+    def __repr__(self):
+        return f"<Topic {self.id}: {self.title}>"
 
 # ---------------------------------------------------------------------------
 # In-memory sample data  (Step 1 – no database)
@@ -121,4 +160,6 @@ def subject(subject_id: str):
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    with app.app_context():
+        db.create_all()          # creates studysprint.db + tables if not present
+    app.run(host="0.0.0.0", port=5001, debug=True)
