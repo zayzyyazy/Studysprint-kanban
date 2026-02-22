@@ -64,8 +64,6 @@ STATUS_COLUMN = {
     "Done":        "done",
 }
 
-VALID_STATUSES = list(STATUS_COLUMN.keys())
-
 
 def priority_score(topic) -> float:
     remaining       = 1 - topic.completion / 100
@@ -80,6 +78,7 @@ def subject_completion(subject) -> int:
 
 
 def parse_topic_form(form) -> tuple:
+    """Extract and validate topic fields. Status is derived from completion."""
     title = form.get("title", "").strip()
 
     try:
@@ -88,16 +87,18 @@ def parse_topic_form(form) -> tuple:
         difficulty = 5
 
     try:
-        completion = max(0, min(100, int(form.get("completion", 0))))
+        completion = int(form.get("completion", 0))
     except (ValueError, TypeError):
         completion = 0
 
-    status = form.get("status", "Not Started")
-    if status not in VALID_STATUSES:
+    if completion <= 0:
+        completion = 0
         status = "Not Started"
-
-    if status == "Done":
+    elif completion >= 100:
         completion = 100
+        status = "Done"
+    else:
+        status = "In Progress"
 
     return title, difficulty, completion, status
 
@@ -164,7 +165,6 @@ def subject(subject_id: int):
         subject=subj,
         columns=columns,
         overall_completion=subject_completion(subj),
-        valid_statuses=VALID_STATUSES,
     )
 
 

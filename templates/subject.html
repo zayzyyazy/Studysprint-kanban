@@ -21,7 +21,7 @@
   <div class="kanban-column kanban-column--{{ col_key }}">
 
     <div class="kanban-column__header">
-      <h2 class="kanban-column__title">{{ col.label }}</h2>
+      <span class="kanban-column__title">{{ col.label }}</span>
       <span class="kanban-column__badge">{{ col.topics | length }}</span>
     </div>
 
@@ -30,15 +30,11 @@
         {% for topic in col.topics %}
         <div class="topic-card topic-card--{{ col_key }}">
 
-          {# Title + difficulty badge #}
           <div class="topic-card__top">
             <span class="topic-card__title">{{ topic.title }}</span>
-            <span class="topic-card__diff" title="Difficulty {{ topic.difficulty }}/10">
-              D{{ topic.difficulty }}
-            </span>
+            <span class="topic-card__diff" title="Difficulty {{ topic.difficulty }}/10">D{{ topic.difficulty }}</span>
           </div>
 
-          {# Completion progress bar #}
           <div class="topic-card__progress-label">
             <span>Completion</span>
             <span>{{ topic.completion }}%</span>
@@ -48,14 +44,11 @@
                  style="width: {{ topic.completion }}%"></div>
           </div>
 
-          {# Priority score #}
           <div class="topic-card__priority">
             Priority: <strong>{{ "%.2f"|format(topic.priority) }}</strong>
           </div>
 
-          {# Actions: edit (collapsible) + delete #}
           <div class="topic-card__actions">
-
             <details class="edit-details">
               <summary class="btn btn--sm btn--secondary">Edit</summary>
               <form method="POST"
@@ -66,7 +59,7 @@
                   <input type="text" name="title" value="{{ topic.title }}"
                          required class="form-input form-input--sm" />
                 </div>
-                <div class="form-row form-row--3">
+                <div class="form-row form-row--2">
                   <div class="form-group">
                     <label class="form-label">Difficulty</label>
                     <input type="number" name="difficulty"
@@ -79,16 +72,8 @@
                            min="0" max="100" value="{{ topic.completion }}"
                            class="form-input form-input--sm" />
                   </div>
-                  <div class="form-group">
-                    <label class="form-label">Status</label>
-                    <select name="status" class="form-input form-input--sm">
-                      {% for s in valid_statuses %}
-                      <option value="{{ s }}"
-                        {% if s == topic.status %}selected{% endif %}>{{ s }}</option>
-                      {% endfor %}
-                    </select>
-                  </div>
                 </div>
+                <p class="form-hint">Status is set automatically from completion.</p>
                 <button type="submit" class="btn btn--primary btn--sm">Save</button>
               </form>
             </details>
@@ -98,54 +83,44 @@
                   class="delete-form">
               <button type="submit" class="btn btn--sm btn--danger">Delete</button>
             </form>
+          </div>
 
-          </div>{# /.topic-card__actions #}
-        </div>{# /.topic-card #}
+        </div>
         {% endfor %}
       {% else %}
         <p class="kanban-empty">No topics here yet.</p>
       {% endif %}
-    </div>{# /.kanban-cards #}
+    </div>
 
-  </div>{# /.kanban-column #}
+  </div>
   {% endfor %}
-</div>{# /.kanban-board #}
+</div>
 
 {# ── Add Topic form ───────────────────────────────────────────────────── #}
-<section class="add-panel">
+<section class="add-panel add-panel--primary">
   <h2 class="add-panel__title">Add Topic to {{ subject.name }}</h2>
   <form method="POST"
         action="{{ url_for('add_topic', subject_id=subject.id) }}"
-        class="add-form add-form--topic">
-    <div class="form-row form-row--topic">
-      <div class="form-group form-group--grow">
-        <label class="form-label" for="new-title">Title</label>
-        <input type="text" id="new-title" name="title"
-               placeholder="e.g. Integration Techniques"
-               required class="form-input" autocomplete="off" />
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="new-difficulty">Difficulty</label>
-        <input type="number" id="new-difficulty" name="difficulty"
-               min="1" max="10" value="5" class="form-input form-input--short" />
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="new-completion">Completion %</label>
-        <input type="number" id="new-completion" name="completion"
-               min="0" max="100" value="0" class="form-input form-input--short" />
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="new-status">Status</label>
-        <select id="new-status" name="status" class="form-input">
-          {% for s in valid_statuses %}
-          <option value="{{ s }}">{{ s }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="form-group form-group--btn">
-        <label class="form-label">&nbsp;</label>
-        <button type="submit" class="btn btn--primary">+ Add Topic</button>
-      </div>
+        class="add-form">
+    <div class="form-group form-group--grow">
+      <label class="form-label" for="new-title">Title</label>
+      <input type="text" id="new-title" name="title"
+             placeholder="e.g. Integration Techniques"
+             required class="form-input" autocomplete="off" />
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="new-difficulty">Difficulty</label>
+      <input type="number" id="new-difficulty" name="difficulty"
+             min="1" max="10" value="5" class="form-input form-input--short" />
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="new-completion">Completion %</label>
+      <input type="number" id="new-completion" name="completion"
+             min="0" max="100" value="0" class="form-input form-input--short" />
+    </div>
+    <div class="form-group form-group--btn">
+      <label class="form-label">&nbsp;</label>
+      <button type="submit" class="btn btn--primary">Add Topic</button>
     </div>
   </form>
 </section>
